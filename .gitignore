@@ -8,5 +8,20 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Ignore all log files and folders named logs
+logs/
+
+# Ignore all .pth files in Factory test/nn folder
+logs/rl_games/Factory/test/nn/*.pth# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
 logs/
 logs/
