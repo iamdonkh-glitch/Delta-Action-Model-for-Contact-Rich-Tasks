@@ -1,1 +1,0 @@
-/home/max/peg_insert/.venv/bin/python3 /home/max/IsaacLabTactile/scripts/reinforcement_learning/sb3/train.py --task Isaac-Cartpole-v0 --num_envs 64
