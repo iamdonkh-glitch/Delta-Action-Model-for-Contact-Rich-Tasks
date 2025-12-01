@@ -1,0 +1,111 @@
+params:
+  seed: 0
+  algo:
+    name: a2c_continuous
+  env:
+    clip_actions: 1.0
+  model:
+    name: continuous_a2c_logstd
+  network:
+    name: actor_critic
+    separate: false
+    space:
+      continuous:
+        mu_activation: None
+        sigma_activation: None
+        mu_init:
+          name: default
+        sigma_init:
+          name: const_initializer
+          val: 0
+        fixed_sigma: false
+    mlp:
+      units:
+      - 512
+      - 128
+      - 64
+      activation: elu
+      d2rl: false
+      initializer:
+        name: default
+      regularizer:
+        name: None
+    rnn:
+      name: lstm
+      units: 1024
+      layers: 2
+      before_mlp: true
+      concat_input: true
+      layer_norm: true
+  load_checkpoint: false
+  load_path: ''
+  config:
+    name: Factory
+    device: cuda:0
+    full_experiment_name: test
+    env_name: rlgpu
+    multi_gpu: false
+    ppo: true
+    mixed_precision: true
+    normalize_input: true
+    normalize_value: true
+    value_bootstrap: true
+    num_actors: 128
+    reward_shaper:
+      scale_value: 1.0
+    normalize_advantage: true
+    gamma: 0.995
+    tau: 0.95
+    learning_rate: 0.0001
+    lr_schedule: adaptive
+    schedule_type: standard
+    kl_threshold: 0.008
+    score_to_win: 20000
+    max_epochs: 200
+    save_best_after: 10
+    save_frequency: 100
+    print_stats: true
+    grad_norm: 1.0
+    entropy_coef: 0.0
+    truncate_grads: true
+    e_clip: 0.2
+    horizon_length: 128
+    minibatch_size: 512
+    mini_epochs: 4
+    critic_coef: 2
+    clip_value: true
+    seq_length: 128
+    bounds_loss_coef: 0.0001
+    central_value_config:
+      minibatch_size: 512
+      mini_epochs: 4
+      learning_rate: 1e-4
+      lr_schedule: adaptive
+      kl_threshold: 0.008
+      clip_value: true
+      normalize_input: true
+      truncate_grads: true
+      network:
+        name: actor_critic
+        central_value: true
+        mlp:
+          units:
+          - 512
+          - 128
+          - 64
+          activation: elu
+          d2rl: false
+          initializer:
+            name: default
+          regularizer:
+            name: None
+        rnn:
+          name: lstm
+          units: 1024
+          layers: 2
+          before_mlp: true
+          concat_input: true
+          layer_norm: true
+    player:
+      deterministic: false
+    train_dir: logs/rl_games/Factory

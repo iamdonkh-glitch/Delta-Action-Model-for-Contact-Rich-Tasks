@@ -1,0 +1,73 @@
+[project]
+name = "peg_insert"
+version = "0.1.0"
+description = "ADD_DESCRIPTIONS_HERE"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  # PyTorch (CUDA 12.8)
+  "torch==2.7.0",
+  "torchvision==0.22.0",
+
+  # Core dependencies
+  "numpy<2",
+  "onnx>=1.18.0",
+  "prettytable==3.3.0",
+  "toml",
+
+  # Devices
+  "hidapi==0.14.0.post2",
+
+  # Reinforcement learning
+  "gymnasium",
+  "isaaclab-rl[all]",
+  "isaaclab-mimic[all]",
+
+  # Procedural generation
+  "trimesh",
+  "pyglet<2",
+
+  # Image processing / modeling
+  "transformers",
+  "einops",
+  "pillow",
+  "warp-lang",
+
+  # Livestream / web
+  "starlette==0.45.3",
+
+  # Misc / existing project deps
+  "pygame>=2.3.0",
+
+  # Testing
+  "pytest",
+  "pytest-mock",
+  "junitparser",
+  "flatdict==4.0.1",
+  "flaky",
+
+  # Dev tools
+  "pre-commit",
+
+  # Isaac Lab editable packages
+  "isaaclab",
+  "isaaclab-assets",
+  "isaaclab-tasks",
+  "isaaclab-rl",
+  "isaaclab-mimic",
+]
+
+[tool.uv.sources]
+isaaclab = { path = "IsaacLab/source/isaaclab", editable = true }
+isaaclab-assets = { path = "IsaacLab/source/isaaclab_assets", editable = true }
+isaaclab-tasks = { path = "IsaacLab/source/isaaclab_tasks", editable = true }
+isaaclab-rl = { path = "IsaacLab/source/isaaclab_rl", editable = true }
+isaaclab-mimic = { path = "IsaacLab/source/isaaclab_mimic", editable = true }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
