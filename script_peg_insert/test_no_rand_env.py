@@ -37,7 +37,7 @@ for step in range(1000):
 
 
         joint_pos = torch.tensor([[-0.2432,  0.4370,  0.2486, -2.0322, -0.1641,  2.4508,  0.8951,  0.0040,0.0040]], device=env.device)
-        joint_vel = torch.tensor([[-1.2188e+00,  1.1636e-01,  1.2498e+00,  6.0766e-03, -8.4078e-01,
+        joint_vel = 0* torch.tensor([[-1.2188e+00,  1.1636e-01,  1.2498e+00,  6.0766e-03, -8.4078e-01,
          -7.3975e-02,  5.6004e-01,  5.0424e-06,  7.1064e-06]], device=env.device)
         env.set_reset_robot_pose(joint_pos, joint_vel)
         held_pos = torch.tensor([[5.9958e-01, 4.0278e-05, 8.9988e-02]], device=env.device)

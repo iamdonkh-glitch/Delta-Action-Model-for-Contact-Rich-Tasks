@@ -146,53 +146,46 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     episodes_run = 0
     max_steps = args_cli.max_steps
 
-    if not hasattr(env.unwrapped, "_get_factory_obs_state_dict"):
-        raise AttributeError("Underlying environment is missing _get_factory_obs_state_dict().")
-
     while simulation_app.is_running() and episodes_run < args_cli.num_episodes:
-        episode_traj = {}
+        traj = []  # one trajectory = list of per-step state dicts
         step_idx = 0
         while simulation_app.is_running():
-            # use no_grad to avoid creating inference tensors that block env resets
             with torch.no_grad():
-                start_time = time.time()
                 obs_torch = agent.obs_to_torch(obs)
                 actions = agent.get_action(obs_torch)
                 obs, _, dones, _ = env.step(actions)
 
+                # grab current state dict and append
                 _, state_dict, _ = env.unwrapped._get_factory_obs_state_dict()
-                for k, v in state_dict.items():
-                    episode_traj.setdefault(k, []).append(v.clone().cpu())
-                step_idx += 1
+                traj.append({k: v.clone().cpu() for k, v in state_dict.items()})
 
+                step_idx += 1
                 if len(dones) > 0 and torch.any(dones):
                     if agent.is_rnn and agent.states is not None:
                         for s in agent.states:
                             s[:, dones, :] = 0.0
                     episodes_run += 1
-                    trajectories.append(episode_traj)
+                    trajectories.append(traj)
                     break
 
                 if max_steps is not None and step_idx >= max_steps:
                     print(f"[WARN] Episode {episodes_run + 1}: reached max_steps={max_steps} before episode end.")
                     episodes_run += 1
-                    trajectories.append(episode_traj)
+                    trajectories.append(traj)
                     break
 
-            sleep_time = dt - (time.time() - start_time)
-            if args_cli.real_time and sleep_time > 0:
-                time.sleep(sleep_time)
+            # real-time sleep logic stays here if needed
+
         if episodes_run < args_cli.num_episodes:
             obs = env.reset()
             if isinstance(obs, dict):
                 obs = obs.get("obs", obs)
 
-    env.close()
-
     output_path = args_cli.output or os.path.join(log_dir, "state_trajectories.pt")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     torch.save(trajectories, output_path)
-    print(f"[INFO] Saved {len(trajectories)} episode trajectories to {output_path}")
+    print(f"[INFO] Saved {len(trajectories)} trajectories to {output_path}")
+
 
 
 if __name__ == "__main__":

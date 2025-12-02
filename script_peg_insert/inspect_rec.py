@@ -102,3 +102,5 @@ else:
     print(f"\nContent:\n{data}")
 
 print("\n" + "=" * 80)
+step = data[0]
+print (f"\nSample step data:\n{step}")
