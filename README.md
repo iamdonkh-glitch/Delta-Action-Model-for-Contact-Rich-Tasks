@@ -84,9 +84,11 @@ If you have a folder on your computer with project files and want to upload them
 
 2. **Copy your files** from your local folder into the cloned repository:
    ```bash
-   # Copy all files from your folder to the repository root (including hidden files)
+   # Linux/Mac: Copy all files from your folder to current directory (including hidden files)
+   # The trailing '/.' is important - it copies contents, not the folder itself
    cp -r /path/to/your/folder/. .
-   # Or on Windows (Command Prompt):
+   
+   # Windows (Command Prompt):
    # xcopy C:\path\to\your\folder\ . /E /H /Y
    ```
 
@@ -100,8 +102,9 @@ If you have a folder on your computer with project files and want to upload them
    ```bash
    # Check your current branch name
    git branch --show-current
-   # Then push (replace 'main' with your branch name if different, e.g., 'master')
-   git push -u origin main
+   # Then push to that branch (usually 'main' or 'master')
+   git push -u origin $(git branch --show-current)
+   # Or manually: git push -u origin main
    ```
 
 ### Method 2: Using GitHub Desktop
