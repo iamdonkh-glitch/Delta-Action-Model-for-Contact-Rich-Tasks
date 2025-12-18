@@ -139,41 +139,23 @@ uv run script_peg_insert/test_success.py
 
 ```
 Delta-Action-Model-for-Contact-Rich-Tasks/
-├── IsaacLab/                      # Modified Isaac Lab for delta action training
-├── configs/                        # Configuration files
-│   ├── delta_model_config.yaml    # Delta model training config
-│   ├── base_policy_config.yaml    # Base policy config
-│   └── tasks/                     # Task-specific configs
-├── scripts/                        # Training and evaluation scripts
-│   ├── train_base_policy.py       # Train baseline RL policy
-│   ├── train_delta_model.py       # Train delta action model
-│   ├── collect_demonstrations.py  # Data collection
-│   ├── finetune_delta_model.py    # Fine-tune with real data
-│   ├── evaluate.py                # Evaluation script
-│   ├── compare_methods.py         # Ablation studies
-│   ├── deploy_sim.py              # Sim deployment
-│   └── deploy_real.py             # Real robot deployment
-├── models/                         # Model definitions
-│   ├── delta_model. py             # Delta action model architectures
-│   └── base_policy.py             # Policy network definitions
-├── utils/                          # Utility functions
-│   ├── data_utils.py              # Data loading and processing
-│   ├── visualization. py           # Plotting and rendering
-│   └── metrics.py                 # Evaluation metrics
-├── data/                           # Data directory (generated)
-│   ├── demonstrations/            # Collected demo data
-│   ├── randomized_demos/          # Randomized dynamics data
-│   └── real_robot/                # Real robot data
-├── logs/                           # Training logs (generated)
-│   ├── base_policy/               # Base policy checkpoints
-│   ├── delta_model/               # Delta model checkpoints
-│   └── tb/                        # Tensorboard logs
-├── results/                        # Evaluation results (generated)
-│   ├── videos/                    # Rendered videos
-│   └── ablation/                  # Ablation study results
-├── pyproject.toml                  # Project dependencies
-├── . envrc                          # Environment variables (direnv)
-└── README.md                       # This file
+├── IsaacLab/                           # Modified Isaac Lab with factory tasks
+│   └── source/isaaclab_tasks/
+│       └── direct/factory/             # Contains modified peg insertion envs for delta action model training and policy fine-tuning
+├── script_peg_insert/                  # Main scripts
+│   ├── train.py                        # Train base open-loop policy
+│   ├── train_closeloop.py              # Train delta model (closed-loop)
+│   ├── record_ref.py                   # Record reference trajectories
+│   ├── inspect_rec.py                  # Inspect recorded data
+│   ├── test_success.py                 # Evaluate success rate
+│   ├── ...                             # Other useful scripts
+├── main.py                             # Entry point (if needed)
+├── pyproject.toml                      # Python dependencies
+├── . envrc                              # Environment variables
+├── . gitignore                          # Git ignore rules
+├── final_report.pdf                    # Project report
+├── demo video.mp4                      # Demo video
+└── README.md     
 ```
 
 ---
@@ -186,36 +168,24 @@ Just follow the standard `uv` practice and add packages and package index to `py
 
 ## Troubleshooting
 
-- **PyGame installation fails**: Make sure you have all the SDL2 system dependencies installed (see Step 4).
-- **IsaacSim not detected**:  Ensure you've sourced the activate script (`source .venv/bin/activate`) and that the `.envrc` file is properly configured.
-- **CUDA issues**: Verify that you have CUDA 12.8 installed and that your GPU drivers are up to date.
-- **Out of memory errors**: Reduce `--num_envs` or `--batch_size` parameters. 
-- **Slow training**: Make sure you're using `--headless` flag and GPU acceleration is enabled.
+
 
 ---
 
 ## Citation
 
-If you use this repository in your research, please cite: 
 
-```bibtex
-@article{delta_action_model_2025,
-  title={Learning a Delta Action Model for Contact-Rich Tasks},
-  author={Your Name},
-  journal={Your Conference/Journal},
-  year={2025}
-}
-```
 
 ---
 
 ## License
 
-[Add your license here]
+
 
 ## Contact
 
-For questions or issues, please open an issue on GitHub or contact [your email].
+For questions or issues, please open an issue on GitHub or contact iamdonkh@umich.edu
+
 
 
 
