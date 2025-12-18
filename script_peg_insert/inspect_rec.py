@@ -1,7 +1,7 @@
 import torch
 
 # Load the trajectories file
-data = torch.load("script_peg_insert/state_records.pt")
+data = torch.load("script_peg_insert/state_record_50.pt")
 
 print("=" * 80)
 print("State Records Content Inspection")
@@ -102,5 +102,5 @@ else:
     print(f"\nContent:\n{data}")
 
 print("\n" + "=" * 80)
-step = data[0]
-print (f"\nSample step data:\n{step}")
+traj_length = len(data[0])
+print(f"Trajectory length (number of steps in first trajectory): {traj_length}")

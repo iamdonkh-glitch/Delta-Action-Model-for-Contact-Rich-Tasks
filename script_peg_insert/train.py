@@ -138,7 +138,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # set directory into agent config
     # logging directory path: <train_dir>/<full_experiment_name>
     agent_cfg["params"]["config"]["train_dir"] = log_root_path
-    agent_cfg["params"]["config"]["full_experiment_name"] = log_dir
+    agent_cfg["params"]["config"]["full_experiment_name"] = "delta_weighted_xyz"
     wandb_project = config_name if args_cli.wandb_project_name is None else args_cli.wandb_project_name
     experiment_name = log_dir if args_cli.wandb_name is None else args_cli.wandb_name
 
@@ -167,8 +167,24 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # set the log directory for the environment (works for all environment types)
     env_cfg.log_dir = os.path.join(log_root_path, log_dir)
 
+
+
+    ##############################################################
+
+    if args_cli.task == "Isaac-Factory-PegInsert-Delta-Direct-v0" or args_cli.task == "Isaac-Factory-PegInsert-Delta-Ref-v0":
+        import torch
+        import numpy as np
+        from omegaconf import OmegaConf
+        from rl_games.common import env_configurations
+        from isaaclab_tasks.direct.factory.factory_env_cfg import FactoryEnvCfg, OBS_DIM_CFG, STATE_DIM_CFG
+        print("begin loading reference")
+        reference = torch.load("script_peg_insert/state_record_50.pt")
+        print("finished loading reference")
+        # --- 1) Load agent cfg and create player before real env ---
+ 
+    ##############################################################
     # create isaac environment
-    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None, reference=reference, BaseAgent=None)
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):

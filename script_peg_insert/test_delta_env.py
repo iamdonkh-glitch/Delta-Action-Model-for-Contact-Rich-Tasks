@@ -11,55 +11,124 @@ simulation_app = app_launcher.app
 import gymnasium as gym
 import isaaclab_tasks  # registers tasks with gym
 import torch
-
+import numpy as np
+from rl_games.common.player import BasePlayer
 from isaaclab_tasks.direct.factory.factory_env_cfg import FactoryTaskPegInsertCfg_NoRand
 from isaaclab_tasks.direct.factory.factory_env_cfg import FactoryTaskPegInsertCfg
+from omegaconf import OmegaConf
+from rl_games.common import env_configurations, vecenv
+from rl_games.torch_runner import Runner
+from isaaclab_rl.rl_games import RlGamesVecEnvWrapper, RlGamesGpuEnv
+from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+import isaaclab_tasks  # registers tasks
+from isaaclab_tasks.direct.factory.factory_env_cfg import FactoryEnvCfg, FactoryTaskPegInsertCfg, OBS_DIM_CFG, STATE_DIM_CFG
 
-# load recorded reference trajectories
-# ref_path = "script_peg_insert/state_records.pt"
-# reference_trajs = torch.load(ref_path)
-# print(f"Loaded {len(reference_trajs)} reference trajectories from {ref_path}")
+# --- 1) Load agent cfg and create player before real env ---
+agent_cfg = OmegaConf.to_container(
+    OmegaConf.load("IsaacLab/source/isaaclab_tasks/isaaclab_tasks/direct/factory/agents/rl_games_ppo_cfg.yaml"),
+    resolve=True,
+)
+agent_cfg["params"]["load_checkpoint"] = True
+agent_cfg["params"]["load_path"] = "logs/rl_games/Factory/test/nn/last_Factory_ep_200_rew_355.1727.pth"  # <-- set this
+agent_cfg["params"]["config"]["num_actors"] = 1  # temp until real env exists
 
-records = torch.load("script_peg_insert/state_records.pt")  # list of {"step": ..., "state": {...}}
+# dummy spaces from FactoryEnv cfg
+cfg_dummy = FactoryEnvCfg()
+obs_dim = sum(OBS_DIM_CFG[o] for o in cfg_dummy.obs_order) + cfg_dummy.action_space
+state_dim = sum(STATE_DIM_CFG[s] for s in cfg_dummy.state_order) + cfg_dummy.action_space
+act_dim = cfg_dummy.action_space
+obs_space = gym.spaces.Box(-np.inf, np.inf, (obs_dim,), dtype=np.float32)
+state_space = gym.spaces.Box(-np.inf, np.inf, (state_dim,), dtype=np.float32)
+act_space = gym.spaces.Box(-1.0, 1.0, (act_dim,), dtype=np.float32)
+
+class DummyEnv:
+    def __init__(self):
+        self.observation_space = obs_space
+        self.state_space = state_space
+        self.action_space = act_space
+    def get_env_info(self):
+        return {"observation_space": obs_space, "state_space": state_space, "action_space": act_space}
+
+env_configurations.register("dummy", {"env_creator": lambda **kwargs: DummyEnv()})
+agent_cfg["params"]["config"]["env_name"] = "dummy"
+agent_cfg["params"]["config"]["num_actors"] = 1
+runner = Runner()
+runner.load(agent_cfg)
+player = runner.create_player()
+# player.restore(agent_cfg["params"]["load_path"])
+player.reset()
+
+print("loading ref....")
+records = torch.load("script_peg_insert/state_record.pt")  # list of {"step": ..., "state": {...}}
 reference = []
 traj1 = records[0]
 reference.append(traj1)  # first traj only
+# records = torch.load("script_peg_insert/state_record.pt")  # list of trajectories
+# traj1 = records[0]
+# assert len(traj1) == 150, f"unexpected traj1 length {len(traj1)}"
+# reference = [traj1[start:start + 5] for start in range(0, 150, 5)]  # 30 slices: 0-4, 5-9, ..., 145-149
 
+print("ref loaded. creating env...")
 # create env
 cfg = FactoryTaskPegInsertCfg_NoRand()
-cfg.scene.num_envs = 2
-env = gym.make("Isaac-Factory-PegInsert-Delta-Direct-v0", cfg=cfg, reference=reference)
+cfg.scene.num_envs = 1
+env = gym.make("Isaac-Factory-PegInsert-Delta-Ref-v0", cfg=cfg, reference=reference, BaseAgent=None)
 env = env.unwrapped
 
 obs, info = env.reset()
+print(f"env reset obs: {obs}")
+current_robot_state = env.get_robot_state()
+print(f"step 0 robot state: {current_robot_state}")
+
+
+# guard against shorter refs
+ref_entry = reference[env._ref_traj_ids[0]][0]
+ref_robot_state = {
+                "joint_pos": ref_entry["joint_pos"],
+                #"joint_vel": ref_entry["joint_vel"],
+                "fingertip_pos": ref_entry["fingertip_pos"],
+                "fingertip_quat": ref_entry["fingertip_quat"],
+            }
+print(f"ref robot state (env {0}, step {0}): {ref_robot_state}")
+reward = 0
 for step in range(1000):
     # sample random action
-    action = env.action_space.sample()
-    #print ("Action:", action)
-    # action_space is already batched (num_envs, action_dim); keep shape (1, 6)
+    action = 0* env.action_space.sample()
+
     action = torch.tensor(action, device=env.device)
-    # step the sim
+
     obs, rew, term, trunc, info = env.step(action)
-    print("Action:", action)
-    if term.any().item() or trunc.any().item() or step%50 == 0:
+    reward += rew.item()
+    print("reward at step ", step+1, " is ", rew.item() )
+    current_robot_state = env.get_robot_state()
+    print(f"step {step+1} robot state: {current_robot_state}")
+    obs_dict,_,_ = env.unwrapped._get_factory_obs_state_dict()
+    nextaaction = obs_dict["ref_actions"].cpu().numpy()
+    print(f"next ref action: {nextaaction}")
 
-        # joint_pos = torch.tensor([[-0.2432,  0.4370,  0.2486, -2.0322, -0.1641,  2.4508,  0.8951,  0.0040,0.0040]], device=env.device)
-        # joint_vel = 0* torch.tensor([[-1.2188e+00,  1.1636e-01,  1.2498e+00,  6.0766e-03, -8.4078e-01,
-        #  -7.3975e-02,  5.6004e-01,  5.0424e-06,  7.1064e-06]], device=env.device)
-        # env.set_reset_robot_pose(joint_pos, joint_vel)
-        # held_pos = torch.tensor([[5.9958e-01, 4.0278e-05, 8.9988e-02]], device=env.device)
-        # held_quat = torch.tensor([[-3.2815e-05, -9.7977e-05, -3.3006e-05,  1.0000e+00]], device=env.device)
-        # fixed_pos = torch.tensor([[0.6000, 0.0000, 0.0500]], device=env.device)
-        # fixed_quat = torch.tensor([[1., 0., 0., 0.]], device=env.device)
-        # fixed_pose = {"pos": fixed_pos, "quat": fixed_quat}
-        # held_pose = {"pos": held_pos, "quat": held_quat}
-        # env.set_reset_asset_pose(fixed_pose, held_pose)
+        # Reference robot state for this env and step
+    env_id = 0  # only one env in this script
+    traj_idx = env.unwrapped._ref_traj_ids[env_id].item()
+    if step+1 < len(reference[traj_idx]):  # guard against shorter refs
+            ref_entry = reference[traj_idx][step+1]
+            ref_robot_state = {
+                "joint_pos": ref_entry["joint_pos"],
+                #"joint_vel": ref_entry["joint_vel"],
+                "fingertip_pos": ref_entry["fingertip_pos"],
+                "fingertip_quat": ref_entry["fingertip_quat"],
+                "fixed_pos": ref_entry["fixed_pos"],
+            }
+            print(f"ref robot state (env {env_id}, step {step+1}): {ref_robot_state}")
+    else:
+            print(f"ref robot state unavailable: step {step} >= len(reference[{traj_idx}])")
+
+    if term.any().item() or trunc.any().item():
         obs, info = env.reset()
-        rob_state = env.get_robot_state()
-        ass_state = env.get_asset_state()
-
-        print("Reset Robot State:", rob_state)
-        print("Reset Asset State:", ass_state)
-
+        reset_robot_state = env.get_robot_state()
+        print(f"reset robot state: {reset_robot_state}")
+        break
+  
+print("Total reward:", reward)
 env.close()
 simulation_app.close()
+

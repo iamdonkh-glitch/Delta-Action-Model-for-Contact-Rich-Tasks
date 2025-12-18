@@ -132,8 +132,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     agent.restore(resume_path)
     agent.reset()
 
+    trajectories = []
+    episodes_run = 0
+    max_steps = args_cli.max_steps
+
     dt = env.unwrapped.step_dt
     obs = env.reset()
+
     if isinstance(obs, dict):
         obs = obs.get("obs", obs)
 
@@ -142,13 +147,21 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if agent.is_rnn:
         agent.init_rnn()
 
-    trajectories = []
-    episodes_run = 0
-    max_steps = args_cli.max_steps
+    
 
     while simulation_app.is_running() and episodes_run < args_cli.num_episodes:
         traj = []  # one trajectory = list of per-step state dicts
         step_idx = 0
+        
+        # ref state 0
+        _, state_dict, _ = env.unwrapped._get_factory_obs_state_dict()
+        step_rec = {k: v.clone().cpu() for k, v in state_dict.items()}
+        step_rec["joint_pos"] = env.unwrapped.get_robot_state()["joint_pos"].clone().cpu()
+        # no action yet: store a zero vector with the right shape
+        zero_action = torch.zeros_like(torch.as_tensor(env.action_space.sample()))
+        step_rec["action"] = zero_action
+        traj.append(step_rec)
+
         while simulation_app.is_running():
             with torch.no_grad():
                 obs_torch = agent.obs_to_torch(obs)
@@ -157,8 +170,11 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
                 # grab current state dict and append
                 _, state_dict, _ = env.unwrapped._get_factory_obs_state_dict()
-                traj.append({k: v.clone().cpu() for k, v in state_dict.items()})
-
+                step_rec = {k: v.clone().cpu() for k, v in state_dict.items()}
+                #state dict only contains part of joint pos ..
+                step_rec["joint_pos"]= env.unwrapped.get_robot_state()["joint_pos"].clone().cpu()
+                step_rec["action"]= actions.detach().clone().cpu()
+                traj.append(step_rec)
                 step_idx += 1
                 if len(dones) > 0 and torch.any(dones):
                     if agent.is_rnn and agent.states is not None:
