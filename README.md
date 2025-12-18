@@ -68,3 +68,80 @@ Watch a demonstration of the delta action model in action:
 
 Or view on YouTube: [Demo Video](https://youtube.com/watch?v=YOUR_VIDEO_ID)
 ```
+
+## How to Upload Your Local Folder to This Repository
+
+If you have a folder on your computer with project files and want to upload them to this repository (so the files appear at the root level, not nested in a folder), follow these steps:
+
+### Method 1: Using Git Command Line (Recommended)
+
+1. **Clone this repository** (if you haven't already):
+   ```bash
+   git clone https://github.com/iamdonkh-glitch/Delta-Action-Model-for-Contact-Rich-Tasks.git
+   cd Delta-Action-Model-for-Contact-Rich-Tasks
+   ```
+
+2. **Copy your files** from your local folder into the cloned repository:
+   ```bash
+   # Copy all files from your folder to the repository root
+   cp -r /path/to/your/folder/* .
+   # Or on Windows:
+   # xcopy C:\path\to\your\folder\* . /E /H
+   ```
+
+3. **Add and commit your files**:
+   ```bash
+   git add .
+   git commit -m "Add project files"
+   git push origin main
+   ```
+
+### Method 2: Using GitHub Desktop
+
+1. **Clone the repository** using GitHub Desktop
+2. **Open the repository folder** in your file explorer
+3. **Copy all files** from your folder and paste them into the repository folder
+4. **Commit and push** the changes using GitHub Desktop
+
+### Method 3: Using GitHub Web Interface (for small projects)
+
+1. **Navigate to your repository** on GitHub
+2. Click **"Add file"** → **"Upload files"**
+3. **Drag and drop** all files from your folder (not the folder itself)
+4. Click **"Commit changes"**
+
+### Important Tips
+
+- **Don't drag the folder itself** - open the folder and drag/copy the files inside it
+- **Be careful with the README.md** - if your folder has a README, it will replace this one
+- **Use `.gitignore`** to exclude files you don't want to upload (like `node_modules/`, `.env`, etc.)
+- **For large files** (>100MB), consider using Git LFS (Large File Storage)
+
+### Example `.gitignore` File
+
+Create a `.gitignore` file to exclude common files you don't want to upload:
+
+```
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+
+# Environment variables
+.env
+.env.local
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+
+# Build outputs
+dist/
+build/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+```
