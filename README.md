@@ -96,7 +96,8 @@ If you have a folder on your computer with project files and want to upload them
    
    ```powershell
    # Windows (PowerShell) - copies all files including hidden:
-   Get-ChildItem -Path "C:\path\to\your\folder" -Recurse -Force | Copy-Item -Destination "." -Force
+   Copy-Item -Path "C:\path\to\your\folder\*" -Destination "." -Recurse -Force
+   Get-ChildItem -Path "C:\path\to\your\folder" -Hidden | Copy-Item -Destination "." -Recurse -Force
    ```
 
 3. **Add and commit your files**:
