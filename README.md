@@ -86,8 +86,8 @@ If you have a folder on your computer with project files and want to upload them
    ```bash
    # Copy all files from your folder to the repository root (including hidden files)
    cp -r /path/to/your/folder/. .
-   # Or on Windows:
-   # xcopy C:\path\to\your\folder\* . /E /H /Y
+   # Or on Windows (Command Prompt):
+   # xcopy C:\path\to\your\folder\*.* . /E /H /Y
    ```
 
 3. **Add and commit your files**:
@@ -123,7 +123,7 @@ If you have a folder on your computer with project files and want to upload them
 
 Create a `.gitignore` file to exclude common files you don't want to upload:
 
-```
+```gitignore
 # Dependencies
 node_modules/
 venv/
