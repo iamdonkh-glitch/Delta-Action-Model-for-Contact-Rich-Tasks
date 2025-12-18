@@ -12,7 +12,7 @@ Follow the guide to everything before the `Installing Isaac Lab` section.
 
 ### 2. Install IsaacLab
 
-Follow the guide to clone your favorite IsaacLab version and create the Isaac Sim Symbolic Link. 
+Use the IsaacLab with modified environment in this repo and create the Isaac Sim Symbolic Link. 
 
 ### 3. Setting up a Python Environment (DIFFERENT!)
 
@@ -180,7 +180,7 @@ python3 scripts/train_delta_model.py --config configs/your_config.yaml
 
 ```
 Delta-Action-Model-for-Contact-Rich-Tasks/
-├── IsaacLab/           # Isaac Lab installation
+├── IsaacLab/           # Modified Issac Lab for delta action training and policy fine-tuning
 ├── configs/            # Configuration files
 ├── scripts/            # Training and evaluation scripts
 ├── models/             # Model definitions
@@ -212,3 +212,4 @@ If you use this repository in your research, please cite:
   year={2025}
 }
 ```
+
