@@ -159,9 +159,9 @@ If you get an error like `"Password authentication is not supported"` or `"Authe
 
 3. **Change your remote URL to SSH**:
    ```bash
-   # For this repository:
-   git remote set-url origin git@github.com:iamdonkh-glitch/Delta-Action-Model-for-Contact-Rich-Tasks.git
-   # Or for any repository: git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+   # Replace USERNAME/REPOSITORY with your repository info
+   git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+   # For this repo: git@github.com:iamdonkh-glitch/Delta-Action-Model-for-Contact-Rich-Tasks.git
    git push -u origin main
    ```
 
