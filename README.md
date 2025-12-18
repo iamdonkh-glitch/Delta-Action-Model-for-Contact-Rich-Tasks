@@ -5,7 +5,7 @@ Learning a delta action model that makes up for dynamic difference between sim a
 ## Table of Contents
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Usage Examples](#usage-examples)
+- [Demo](#demo)#
 - [Project Structure](#project-structure)
 - [Troubleshooting](#troubleshooting)
 - [Citation](#citation)
@@ -135,6 +135,11 @@ In test_success.py, replace the model path with your own and test its success ra
 uv run script_peg_insert/test_success.py 
 ```
 
+## Demo
+
+
+![Demo](demo.gif)
+
 ## Project Structure
 
 ```
@@ -185,6 +190,7 @@ Just follow the standard `uv` practice and add packages and package index to `py
 ## Contact
 
 For questions or issues, please open an issue on GitHub or contact iamdonkh@umich.edu
+
 
 
 
