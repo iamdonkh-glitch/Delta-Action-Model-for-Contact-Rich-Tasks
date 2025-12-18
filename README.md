@@ -117,6 +117,61 @@ If you have a folder on your computer with project files and want to upload them
    git push -u origin main
    ```
 
+#### Troubleshooting: Authentication Failed
+
+If you get an error like `"Password authentication is not supported"` or `"Authentication failed"`:
+
+**GitHub no longer accepts passwords for Git operations.** You need to use a Personal Access Token (PAT) instead.
+
+**Solution 1: Create and Use a Personal Access Token**
+
+1. **Generate a token** on GitHub:
+   - Go to GitHub.com → Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Or visit: https://github.com/settings/tokens
+   - Click "Generate new token" → "Generate new token (classic)"
+   - Give it a name (e.g., "Git operations")
+   - Select scopes: Check `repo` (gives full repository access)
+   - Click "Generate token"
+   - **Copy the token immediately** (you won't see it again!)
+
+2. **Use the token as your password**:
+   - When Git asks for your password, paste the token instead
+   - Username: your GitHub username (e.g., `iamdonkh`)
+   - Password: paste your Personal Access Token (not your GitHub password)
+
+**Solution 2: Use SSH Instead of HTTPS** (Recommended for frequent use)
+
+1. **Generate an SSH key** (if you don't have one):
+   ```bash
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   # Press Enter to accept default location
+   # Optionally set a passphrase or press Enter for none
+   ```
+
+2. **Add the SSH key to GitHub**:
+   ```bash
+   # Copy your public key
+   cat ~/.ssh/id_ed25519.pub
+   # Or on Windows: type %USERPROFILE%\.ssh\id_ed25519.pub
+   ```
+   - Go to GitHub.com → Settings → SSH and GPG keys → New SSH key
+   - Paste your public key and save
+
+3. **Change your remote URL to SSH**:
+   ```bash
+   git remote set-url origin git@github.com:iamdonkh-glitch/Delta-Action-Model-for-Contact-Rich-Tasks.git
+   git push -u origin main
+   ```
+
+**Solution 3: Use GitHub CLI** (Easiest)
+
+```bash
+# Install GitHub CLI: https://cli.github.com/
+gh auth login
+# Follow the prompts to authenticate
+git push -u origin main
+```
+
 ### Method 2: Using GitHub Desktop
 
 1. **Clone the repository** using GitHub Desktop
