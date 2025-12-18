@@ -87,16 +87,22 @@ If you have a folder on your computer with project files and want to upload them
    # Copy all files from your folder to the repository root (including hidden files)
    cp -r /path/to/your/folder/. .
    # Or on Windows (Command Prompt):
-   # xcopy C:\path\to\your\folder\*.* . /E /H /Y
+   # xcopy C:\path\to\your\folder\* . /E /H /Y
    ```
 
 3. **Add and commit your files**:
    ```bash
    git add .
    git commit -m "Add project files"
-   git push
    ```
-   Note: If you get an error, check your default branch name (might be `main` or `master`) and use `git push origin <branch-name>`
+
+4. **Push your changes**:
+   ```bash
+   # Check your default branch name first
+   git branch
+   # Then push (replace 'main' with your branch name if different, e.g., 'master')
+   git push -u origin main
+   ```
 
 ### Method 2: Using GitHub Desktop
 
