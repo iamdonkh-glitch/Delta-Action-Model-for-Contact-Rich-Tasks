@@ -103,241 +103,37 @@ python3 IsaacLab/scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Ant
 
 ## Quick Start
 
-After installation, activate the environment: 
-```bash
-source .venv/bin/activate
-```
-
 ### Train a base policy in simulation
+First, in factory_env_cfg.py, set scale_fixed_asset: tuple = (2.0,2.0,1.0). This corresponds to the big peg hole in simulation.
+You may use default IsaacLab command to train a base policy in simulation.
 ```bash
-python scripts/train_base_policy.py \
-    --task Isaac-Reach-Franka-v0 \
-    --num_envs 4096 \
-    --headless
+./isaaclab.sh -p scripts/reinforcement_learning/rl_games/train.py \
+  --task Isaac-Factory-PegInsert-Direct-v0 --num_envs 64 
 ```
 
-### Collect demonstration data
+### Collect reference trajectories
+We can then use this policy to collect 50 trajectories on the small peg hole. 
+Before collecting reference trajectories, set scale_fixed_asset: tuple = (1.0,1.0,1.0). This corresponds to the small peg hole in "reality".
 ```bash
-python scripts/collect_demonstrations.py \
-    --policy_path logs/base_policy/model.pt \
-    --num_episodes 1000 \
-    --save_dir data/demonstrations
+uv run script_peg_insert/record_ref.py --task Isaac-Factory-PegInsert-Direct-v0 --agent rl_games_cfg_entry_point --checkpoint [your checkpoint path] --num_episodes 50 
 ```
 
 ### Train the delta action model
+In script_peg_insert/train.py, replace the reference trajectory path with your own path and customize training episodes, then: 
 ```bash
-python scripts/train_delta_model. py \
-    --config configs/delta_model_config.yaml \
-    --data_dir data/demonstrations \
-    --output_dir logs/delta_model
+uv run  script_peg_insert/train.py --task Isaac-Factory-PegInsert-Delta-Direct-v0 --num_envs 64 
 ```
-
-### Evaluate the model
+### Fine-tune the policy in simulation
+We can then augment the environment with the delta actio model and fine-tune the policy. Before training, replace the path for delta action model with your own.
 ```bash
-python scripts/evaluate. py \
-    --base_policy logs/base_policy/model.pt \
-    --delta_model logs/delta_model/best_model.pt \
-    --num_episodes 100 \
-    --render
+run  script_peg_insert/train_closeloop.py --task Isaac-Factory-PegInsert-Delta-CloseLoop-v0 --num_envs 64
 ```
 
----
-
-## Usage Examples
-
-### 1. Training a Base Policy from Scratch
-
-Train a baseline RL policy for a contact-rich manipulation task:
-
+### Evaluate the original or fine-tuned policy
+In test_success.py, replace the model path with your own and test its success rate.
 ```bash
-# For a peg insertion task
-python scripts/train_base_policy.py \
-    --task Isaac-Peg-Insert-v0 \
-    --algo PPO \
-    --num_envs 8192 \
-    --max_iterations 5000 \
-    --headless
-
-# For a block stacking task
-python scripts/train_base_policy.py \
-    --task Isaac-Stack-Cube-v0 \
-    --algo SAC \
-    --num_envs 4096 \
-    --max_iterations 10000 \
-    --headless
+uv run script_peg_insert/test_success.py 
 ```
-
-**Output:** Trained models will be saved to `logs/base_policy/`
-
-### 2. Data Collection with Domain Randomization
-
-Collect training data for the delta model with varying dynamics:
-
-```bash
-# Collect data with physics randomization
-python scripts/collect_demonstrations.py \
-    --policy_path logs/base_policy/model.pt \
-    --task Isaac-Peg-Insert-v0 \
-    --num_episodes 5000 \
-    --randomize_dynamics \
-    --friction_range 0.5 1.5 \
-    --mass_range 0.8 1.2 \
-    --save_dir data/randomized_demos
-```
-
-**Output:** Data saved as `.npz` files containing observations, actions, and delta actions.
-
-### 3. Training the Delta Action Model
-
-Train the delta model to predict action corrections:
-
-```bash
-# Basic training
-python scripts/train_delta_model.py \
-    --config configs/delta_model_config. yaml \
-    --data_dir data/randomized_demos \
-    --output_dir logs/delta_model
-
-# With custom hyperparameters
-python scripts/train_delta_model.py \
-    --config configs/delta_model_config.yaml \
-    --data_dir data/randomized_demos \
-    --output_dir logs/delta_model \
-    --batch_size 256 \
-    --learning_rate 3e-4 \
-    --epochs 100 \
-    --model_type transformer  # or 'mlp', 'lstm'
-```
-
-**Output:** 
-- Trained model checkpoints in `logs/delta_model/checkpoints/`
-- Training logs and tensorboard files in `logs/delta_model/tb/`
-
-### 4. Fine-tuning with Real-world Data
-
-If you have real robot data, fine-tune the delta model:
-
-```bash
-python scripts/finetune_delta_model.py \
-    --pretrained_model logs/delta_model/best_model.pt \
-    --real_data_dir data/real_robot \
-    --sim_data_dir data/randomized_demos \
-    --mixing_ratio 0.3 \  # 30% real data, 70% sim data
-    --output_dir logs/delta_model_finetuned
-```
-
-### 5. Evaluation and Visualization
-
-Evaluate the combined base policy + delta model:
-
-```bash
-# Headless evaluation
-python scripts/evaluate. py \
-    --base_policy logs/base_policy/model. pt \
-    --delta_model logs/delta_model/best_model.pt \
-    --task Isaac-Peg-Insert-v0 \
-    --num_episodes 100 \
-    --save_results
-
-# With visualization
-python scripts/evaluate.py \
-    --base_policy logs/base_policy/model.pt \
-    --delta_model logs/delta_model/best_model.pt \
-    --task Isaac-Peg-Insert-v0 \
-    --num_episodes 10 \
-    --render \
-    --save_video results/videos/
-```
-
-### 6. Ablation Studies
-
-Compare performance with and without delta model:
-
-```bash
-# Baseline only
-python scripts/compare_methods.py \
-    --methods baseline \
-    --base_policy logs/base_policy/model.pt \
-    --task Isaac-Peg-Insert-v0 \
-    --num_episodes 100
-
-# Baseline + Delta Model
-python scripts/compare_methods. py \
-    --methods baseline delta \
-    --base_policy logs/base_policy/model.pt \
-    --delta_model logs/delta_model/best_model.pt \
-    --task Isaac-Peg-Insert-v0 \
-    --num_episodes 100 \
-    --output_dir results/ablation/
-```
-
-### 7. Custom Task Configuration
-
-Create and run a custom contact-rich task:
-
-```bash
-# First, define your task in configs/tasks/custom_task.yaml
-# Then run: 
-python scripts/train_base_policy.py \
-    --config configs/tasks/custom_task. yaml \
-    --num_envs 4096 \
-    --headless
-```
-
-Example `custom_task.yaml`:
-```yaml
-task: 
-  name: "CustomPegInsertion"
-  env: 
-    num_envs: 4096
-    episode_length: 500
-  
-  robot:
-    type: "Franka"
-    dof: 7
-  
-  object:
-    type: "peg"
-    dimensions: [0.02, 0.02, 0.1]
-  
-  reward:
-    success_bonus: 100. 0
-    distance_weight: 1.0
-    contact_penalty: -0.1
-```
-
-### 8. Monitoring Training
-
-Launch tensorboard to monitor training progress:
-
-```bash
-tensorboard --logdir logs/ --port 6006
-```
-
-Then open your browser at `http://localhost:6006`
-
-### 9. Deployment (Sim-to-Real Transfer)
-
-Deploy the trained model to a real robot:
-
-```bash
-# Test in simulation with realistic physics first
-python scripts/deploy_sim. py \
-    --base_policy logs/base_policy/model.pt \
-    --delta_model logs/delta_model/best_model.pt \
-    --task Isaac-Peg-Insert-v0 \
-    --use_realistic_physics \
-    --num_episodes 50
-
-# Deploy to real robot (requires robot connection)
-python scripts/deploy_real. py \
-    --base_policy logs/base_policy/model. pt \
-    --delta_model logs/delta_model/best_model.pt \
-    --robot_ip 192.168.1.100 \
-    --safety_checks
-```
-
----
 
 ## Project Structure
 
@@ -420,6 +216,7 @@ If you use this repository in your research, please cite:
 ## Contact
 
 For questions or issues, please open an issue on GitHub or contact [your email].
+
 
 
 
