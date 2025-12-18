@@ -136,7 +136,7 @@ If you get an error like `"Password authentication is not supported"` or `"Authe
 
 2. **Use the token as your password**:
    - When Git asks for your password, paste the token instead
-   - Username: your GitHub username (e.g., `iamdonkh`)
+   - Username: your GitHub username (e.g., `iamdonkh` for this repo)
    - Password: paste your Personal Access Token (not your GitHub password)
 
 **Solution 2: Use SSH Instead of HTTPS** (Recommended for frequent use)
@@ -159,7 +159,9 @@ If you get an error like `"Password authentication is not supported"` or `"Authe
 
 3. **Change your remote URL to SSH**:
    ```bash
+   # For this repository:
    git remote set-url origin git@github.com:iamdonkh-glitch/Delta-Action-Model-for-Contact-Rich-Tasks.git
+   # Or for any repository: git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
    git push -u origin main
    ```
 
