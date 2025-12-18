@@ -10,27 +10,30 @@ GitHub allows you to drag and drop video files directly into issues, pull reques
 
 To add a video:
 1. Drag and drop your video file into the README editor on GitHub
-2. GitHub will automatically upload it and generate markdown like:
-```markdown
-https://user-images.githubusercontent.com/your-video-url.mp4
-```
+2. GitHub will automatically upload it and generate a URL (the exact format is generated automatically by GitHub)
 
 ### Method 2: Using HTML Video Tag
 You can use HTML5 video tags in your README:
 
 ```html
-<video src="https://your-video-url.mp4" controls="controls" style="max-width: 730px;">
+<video src="https://your-video-url.mp4" controls="controls" style="max-width: 100%;">
 </video>
 ```
 
 ### Method 3: YouTube or Vimeo Embed
-For YouTube videos, use a linked thumbnail approach (GitHub doesn't support iframe):
+GitHub doesn't support iframe embeds, so use a linked thumbnail approach instead.
 
+**For YouTube:**
 ```markdown
 [![Video Title](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
 ```
-
 Replace `VIDEO_ID` with your actual YouTube video ID.
+
+**For Vimeo:**
+```markdown
+[![Video Title](https://vumbnail.com/VIDEO_ID.jpg)](https://vimeo.com/VIDEO_ID)
+```
+Replace `VIDEO_ID` with your actual Vimeo video ID.
 
 ### Method 4: Animated GIFs
 Convert your video to an animated GIF and include it as an image:
