@@ -84,10 +84,10 @@ If you have a folder on your computer with project files and want to upload them
 
 2. **Copy your files** from your local folder into the cloned repository:
    ```bash
-   # Copy all files from your folder to the repository root
-   cp -r /path/to/your/folder/* .
+   # Copy all files from your folder to the repository root (including hidden files)
+   cp -r /path/to/your/folder/. .
    # Or on Windows:
-   # xcopy C:\path\to\your\folder\* . /E /H
+   # xcopy C:\path\to\your\folder\* . /E /H /Y
    ```
 
 3. **Add and commit your files**:
