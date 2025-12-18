@@ -87,9 +87,16 @@ If you have a folder on your computer with project files and want to upload them
    # Linux/Mac: Copy all files from your folder to current directory (including hidden files)
    # The trailing '/.' is important - it copies contents, not the folder itself
    cp -r /path/to/your/folder/. .
+   ```
    
-   # Windows (Command Prompt):
-   # xcopy C:\path\to\your\folder\ . /E /H /Y
+   ```cmd
+   REM Windows (Command Prompt):
+   xcopy C:\path\to\your\folder\ . /E /H /Y
+   ```
+   
+   ```powershell
+   # Windows (PowerShell):
+   Copy-Item -Path "C:\path\to\your\folder\*" -Destination "." -Recurse -Force
    ```
 
 3. **Add and commit your files**:
@@ -103,8 +110,10 @@ If you have a folder on your computer with project files and want to upload them
    # Check your current branch name
    git branch --show-current
    # Then push to that branch (usually 'main' or 'master')
+   # For Git 2.22+:
    git push -u origin $(git branch --show-current)
-   # Or manually: git push -u origin main
+   # Or manually specify the branch:
+   git push -u origin main
    ```
 
 ### Method 2: Using GitHub Desktop
