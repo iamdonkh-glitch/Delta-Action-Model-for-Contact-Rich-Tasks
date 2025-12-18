@@ -80,6 +80,7 @@ If you have a folder on your computer with project files and want to upload them
    git clone https://github.com/iamdonkh-glitch/Delta-Action-Model-for-Contact-Rich-Tasks.git
    cd Delta-Action-Model-for-Contact-Rich-Tasks
    ```
+   Or for any repository: `git clone <your-repo-url>`
 
 2. **Copy your files** from your local folder into the cloned repository:
    ```bash
@@ -93,8 +94,9 @@ If you have a folder on your computer with project files and want to upload them
    ```bash
    git add .
    git commit -m "Add project files"
-   git push origin main
+   git push
    ```
+   Note: If you get an error, check your default branch name (might be `main` or `master`) and use `git push origin <branch-name>`
 
 ### Method 2: Using GitHub Desktop
 
