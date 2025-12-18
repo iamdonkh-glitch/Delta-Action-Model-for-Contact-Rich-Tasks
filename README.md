@@ -87,7 +87,7 @@ If you have a folder on your computer with project files and want to upload them
    # Copy all files from your folder to the repository root (including hidden files)
    cp -r /path/to/your/folder/. .
    # Or on Windows (Command Prompt):
-   # xcopy C:\path\to\your\folder\* . /E /H /Y
+   # xcopy C:\path\to\your\folder\ . /E /H /Y
    ```
 
 3. **Add and commit your files**:
@@ -98,8 +98,8 @@ If you have a folder on your computer with project files and want to upload them
 
 4. **Push your changes**:
    ```bash
-   # Check your default branch name first
-   git branch
+   # Check your current branch name
+   git branch --show-current
    # Then push (replace 'main' with your branch name if different, e.g., 'master')
    git push -u origin main
    ```
