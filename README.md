@@ -14,7 +14,7 @@ Follow the guide to everything before the `Installing Isaac Lab` section.
 
 Use the IsaacLab with modified environment in this repo and create the Isaac Sim Symbolic Link. 
 
-### 3. Setting up a Python Environment (DIFFERENT!)
+### 3. Setting up a Python Environment 
 
 The remainder of this guide assumes that your IsaacLab will be under the root of your project folder like
 ```bash
@@ -71,82 +71,6 @@ export PYTHONPATH="${PWD}:${PYTHONPATH}"
 ```
 
 Then, replacing the official guide to run `isaaclab.sh --install`, modify your `pyproject.toml` so that ALL required packages (RL, testing, dev tools) are in the main dependency list (no extras needed):
-
-```toml
-[project]
-name = "delta-action-model"
-version = "0.1.0"
-description = "Learning a delta action model that makes up for dynamic difference between sim and real for contact-rich tasks"
-readme = "README.md"
-requires-python = ">=3.11,<3.12"
-dependencies = [
-  # PyTorch (CUDA 12.8)
-  "torch==2.7.0",
-  "torchvision==0.22.0",
-
-  # Core dependencies
-  "numpy<2",
-  "onnx>=1.18.0",
-  "prettytable==3.3.0",
-  "toml",
-
-  # Devices
-  "hidapi==0.14.0.post2",
-
-  # Reinforcement learning
-  "gymnasium==1.2.1",
-  "isaaclab-rl[all]",
-  "isaaclab-mimic[all]",
-
-  # Procedural generation
-  "trimesh",
-  "pyglet<2",
-
-  # Image processing / modeling
-  "transformers",
-  "einops",
-  "pillow==11.2.1",
-  "warp-lang",
-
-  # Livestream / web
-  "starlette==0.45.3",
-
-  # Misc
-  "pygame>=2.3.0",
-
-  # Testing
-  "pytest",
-  "pytest-mock",
-  "junitparser",
-  "flatdict==4.0.1",
-  "flaky",
-
-  # Dev tools
-  "pre-commit",
-
-  # Isaac Lab editable packages
-  "isaaclab",
-  "isaaclab-assets",
-  "isaaclab-tasks",
-  "isaaclab-rl",
-  "isaaclab-mimic",
-]
-
-[tool.uv.sources]
-isaaclab = { path = "IsaacLab/source/isaaclab", editable = true }
-isaaclab-assets = { path = "IsaacLab/source/isaaclab_assets", editable = true }
-isaaclab-tasks = { path = "IsaacLab/source/isaaclab_tasks", editable = true }
-isaaclab-rl = { path = "IsaacLab/source/isaaclab_rl", editable = true }
-isaaclab-mimic = { path = "IsaacLab/source/isaaclab_mimic", editable = true }
-
-[[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
-explicit = true
-
-[tool.uv]
-index-strategy = "unsafe-best-match"
-```
 
 Then, run `uv sync` to install all required dependencies.
 
@@ -212,4 +136,5 @@ If you use this repository in your research, please cite:
   year={2025}
 }
 ```
+
 
